@@ -50,8 +50,16 @@ class CliPlay(Cmd):
         """ """
         flist = get_dir_cache()
 
-        for hdr in filter_audio_files(flist):
-            print hdr
+        if args:
+            if args == 'audio':
+                for f in filter_audio_files(flist):
+                    print f
+        else:
+            for f in flist:
+                print f
+
+        # for hdr in filter_audio_files(flist):
+        #     print hdr
 
     def do_quit(self, args):
         """ Generic quit function for now """
