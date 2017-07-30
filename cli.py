@@ -32,14 +32,13 @@ class CliPlay(Cmd):
 
         Cmd.__init__(self)
 
-        self.intro = 'WELCOME TO CLI-PLAY\n'
-
     # Attrs
     def set_prompt(self, prompt):
         self.prompt = prompt
 
     # Hooks
     def preloop(self):
+        self.intro = 'WELCOME TO CLI-PLAY\n'
         self.set_prompt(get_prompt_string())
 
     def postloop(self):
