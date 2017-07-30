@@ -2,13 +2,19 @@ from cmd import Cmd
 
 import os
 
+cache = []
+
 def get_prompt_string():
-    return '(Folder: {} )'.format(os.path.basename(os.getcwd()))
+    """ Default is cwd base """
+    return '(Folder: {}): '.format(os.path.basename(os.getcwd()))
+
+def get_dir_cache():
+    return cache or os.listdir(os.getcwd())
 
 class CliPlay(Cmd):
     # Init
     def __init__(self):
-        """Shell params set here"""
+        """ Shell params set here """
 
         Cmd.__init__(self)
 
@@ -27,8 +33,14 @@ class CliPlay(Cmd):
 
 
     # Do Methods
+    def do_list(self, args):
+        """ """
+        for item in get_dir_cache():
+            print item
+
+
     def do_quit(self, args):
-        """Generic quit function for now."""
+        """ Generic quit function for now """
 
         print "Shutting down..."
 
