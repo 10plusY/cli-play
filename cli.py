@@ -6,14 +6,6 @@ import os
 import sndhdr
 
 cache = None
-#
-# ARG_TREE = {
-#     'list': {'args': []}
-#     'audio': {
-#         'errors': {'missing': 'No audio files here...'}
-#     }
-#
-# }
 
 def get_prompt_string():
     """ Default is cwd base """
@@ -46,12 +38,8 @@ class CliPlay(Cmd):
     def set_prompt(self, prompt):
         self.prompt = prompt
 
-    def print_dir(self):
-        print(dir(self))
-
     # Hooks
     def preloop(self):
-        self.print_dir()
         self.intro = 'WELCOME TO CLI-PLAY\n'
         self.set_prompt(get_prompt_string())
 
@@ -65,8 +53,13 @@ class CliPlay(Cmd):
 
         if args:
             for arg in args.split(' '):
-                action = ARG_TREE[arg]
-                print
+                if arg == 'audio':
+                    af = filter_audio_files(flist)
+                    if list(af):
+                        for a in filter_audio_files(flist):
+                            print(a)
+                    else:
+                        print("No audio files here...")
         else:
             for f in flist:
                 print(f)
