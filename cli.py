@@ -1,6 +1,7 @@
 from cmd import Cmd
 
 import os
+import sndhdr
 
 cache = []
 
@@ -9,7 +10,18 @@ def get_prompt_string():
     return '(Folder: {}): '.format(os.path.basename(os.getcwd()))
 
 def get_dir_cache():
+    """ """
     return cache or os.listdir(os.getcwd())
+
+def filter_audio_files(flist):
+    for fname in flist:
+        try:
+            if sndhdr.what(fname):
+                yield fname
+
+        # Issues with directories - just skip it
+        except:
+            pass
 
 class CliPlay(Cmd):
     # Init
@@ -35,9 +47,8 @@ class CliPlay(Cmd):
     # Do Methods
     def do_list(self, args):
         """ """
-        for item in get_dir_cache():
-            print item
-
+        for hdr in filter_audio_files(flist):
+            print hdr
 
     def do_quit(self, args):
         """ Generic quit function for now """
