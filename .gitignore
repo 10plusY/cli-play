@@ -1,1 +1,4 @@
+# Remnants
 *.pyc
+__pychache__/
+
