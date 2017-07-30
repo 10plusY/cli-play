@@ -3,7 +3,7 @@ from cmd import Cmd
 import os
 
 def get_prompt_string():
-    return '(Folder: {})'.format(os.path.basename(os.getcwd()))
+    return '(Folder: {} )'.format(os.path.basename(os.getcwd()))
 
 class CliPlay(Cmd):
     # Init
