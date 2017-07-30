@@ -1,9 +1,19 @@
+from __future__ import print_function
+
 from cmd import Cmd
 
 import os
 import sndhdr
 
 cache = None
+#
+# ARG_TREE = {
+#     'list': {'args': []}
+#     'audio': {
+#         'errors': {'missing': 'No audio files here...'}
+#     }
+#
+# }
 
 def get_prompt_string():
     """ Default is cwd base """
@@ -36,14 +46,17 @@ class CliPlay(Cmd):
     def set_prompt(self, prompt):
         self.prompt = prompt
 
+    def print_dir(self):
+        print(dir(self))
+
     # Hooks
     def preloop(self):
+        self.print_dir()
         self.intro = 'WELCOME TO CLI-PLAY\n'
         self.set_prompt(get_prompt_string())
 
     def postloop(self):
         pass
-
 
     # Do Methods
     def do_list(self, args):
@@ -51,20 +64,17 @@ class CliPlay(Cmd):
         flist = get_dir_cache()
 
         if args:
-            if args == 'audio':
-                for f in filter_audio_files(flist):
-                    print f
+            for arg in args.split(' '):
+                action = ARG_TREE[arg]
+                print
         else:
             for f in flist:
-                print f
-
-        # for hdr in filter_audio_files(flist):
-        #     print hdr
+                print(f)
 
     def do_quit(self, args):
         """ Generic quit function for now """
 
-        print "Shutting down..."
+        print("Shutting down...")
 
         raise SystemExit
 
