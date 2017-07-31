@@ -27,7 +27,16 @@ def filter_audio_files(flist):
         except:
             pass
 
+def log_list(flist):
+    print(*flist, sep='\n')
+
 ACTION_TREE = {
+    'list': {
+        'audio': {
+            'success': 'Success',
+            'failure': 'No audio files here...'
+        }
+    },
     'add': {
         'success': 'was added!',
         'failure': 'Failed to add file...'
@@ -52,7 +61,7 @@ class CliPlay(Cmd):
     def set_prompt(self, prompt):
         self.prompt = prompt
 
-    def add_to_workinglist(self, fname):
+    def add_to_main_list(self, fname):
         self.workinglist.append(fname)
 
     # Hooks
@@ -70,12 +79,16 @@ class CliPlay(Cmd):
         flist = get_dir_cache()
 
         if args:
+            action = ACTION_TREE['list']
             for arg in args.split(' '):
-                audio_files = filter_audio_files(flist)
-                if list(audio_files):
-                    print(*audio_files, sep='\n')
-                else:
-                    print('No audio files here...')
+                if action[arg]:
+                    response = action[arg]
+                    audio_files = filter_audio_files(flist)
+
+                    if list(audio_files):
+                        print(*audio_files, sep='\n')
+                    else:
+                        print('No audio files here...')
         else:
             print(*flist, sep='\n')
 
@@ -86,11 +99,16 @@ class CliPlay(Cmd):
         flist = get_dir_cache()
 
         if args:
-            response = ACTION_TREE['add']['success']
-            self.add_to_workinglist(args)
-            print('{} '.format(args) + response)
+            if args not in list(filter_audio_files(flist)):
+                response = ACTION_TREE['add']['failure']
+                print(response)
+            else:
+                response = ACTION_TREE['add']['success']
+                self.add_to_main_list(args)
+                print('{} '.format(args) + response)
         else: # No file was passed in
-            print(ACTION_TREE['add']['failure'])
+            response = ACTION_TREE['add']['failure']
+            print(response)
 
     def do_quit(self, args):
         """ Generic quit function for now """
