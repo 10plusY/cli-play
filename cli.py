@@ -27,6 +27,15 @@ def filter_audio_files(flist):
         except:
             pass
 
+ARG_TREE = {
+    'list': {'audio': {'action': filter_audio_files, 'error': 'No audio files in this directory...'}}
+}
+
+def get_arg_response(action, arg):
+    response = ARG_TREE.get(action, None).get(arg, None)
+    return response
+
+
 class CliPlay(Cmd):
     # Init
     def __init__(self):
@@ -51,18 +60,20 @@ class CliPlay(Cmd):
         """ """
         flist = get_dir_cache()
 
+        def print_dir_list(l):
+            for a in l:
+                print(a)
+
         if args:
             for arg in args.split(' '):
-                if arg == 'audio':
-                    af = filter_audio_files(flist)
-                    if list(af):
-                        for a in filter_audio_files(flist):
-                            print(a)
-                    else:
-                        print("No audio files here...")
+                response = get_arg_response('list', arg)
+                audio_files = filter_audio_files(flist)
+                if list(audio_files):
+                    print_dir_list(audio_files)
+                else:
+                    print(response['error'])
         else:
-            for f in flist:
-                print(f)
+            print_dir_list(flist)
 
     def do_quit(self, args):
         """ Generic quit function for now """
