@@ -32,8 +32,11 @@ def log_list(flist):
 
 ACTION_TREE = {
     'list': {
+        'default' : {
+            'success': log_list
+        },
         'audio': {
-            'success': 'Success',
+            'success': log_list,
             'failure': 'No audio files here...'
         }
     },
@@ -78,8 +81,8 @@ class CliPlay(Cmd):
         # Need Decorator
         flist = get_dir_cache()
 
+        action = ACTION_TREE['list']
         if args:
-            action = ACTION_TREE['list']
             for arg in args.split(' '):
                 if action[arg]:
                     response = action[arg]
@@ -88,9 +91,9 @@ class CliPlay(Cmd):
                     if list(audio_files):
                         print(*audio_files, sep='\n')
                     else:
-                        print('No audio files here...')
+                        print(response['failure'])
         else:
-            print(*flist, sep='\n')
+            action['default']['success'](flist)
 
     def do_add(self, args):
         """ """
