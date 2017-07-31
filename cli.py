@@ -27,12 +27,18 @@ def filter_audio_files(flist):
         except:
             pass
 
-ARG_TREE = {
-    'list': {'audio': {'action': filter_audio_files, 'error': 'No audio files in this directory...'}}
+ACTION_TREE = {
+    'list': {
+		'audio': ,
+        ''
+	},
+    'add': {
+        '': ''
+    }
 }
 
 def get_arg_response(action, arg):
-    response = ARG_TREE.get(action, None).get(arg, None)
+    response = ACTION_TREE.get(action, None)
     return response
 
 
@@ -43,9 +49,14 @@ class CliPlay(Cmd):
 
         Cmd.__init__(self)
 
+        self.workinglist = []
+
     # Attrs
     def set_prompt(self, prompt):
         self.prompt = prompt
+
+    def add_to_workinglist(self, fname):
+        self.workinglist.append(fname)
 
     # Hooks
     def preloop(self):
@@ -58,6 +69,7 @@ class CliPlay(Cmd):
     # Do Methods
     def do_list(self, args):
         """ """
+        # Need Decorator
         flist = get_dir_cache()
 
         if args:
@@ -70,6 +82,27 @@ class CliPlay(Cmd):
                     print(response['error'])
         else:
             filter_audio_files(*flist, sep='\n')
+
+    def do_add(self, args):
+        # Want to check if its in the cache
+        flist = get_dir_cache()
+        aflist = list(filter_audio_files(flist))
+
+        if args:
+            for arg in args.split(' '):
+                if arg == 'add':
+                    pass
+                elif arg in aflist:
+
+
+
+
+
+                response = get_arg_response('add', arg)
+                audio_files = filter_audio_files(flist)
+
+
+
 
     def do_quit(self, args):
         """ Generic quit function for now """
