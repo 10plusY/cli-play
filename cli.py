@@ -28,12 +28,9 @@ def filter_audio_files(flist):
             pass
 
 ACTION_TREE = {
-    'list': {
-		'audio': ,
-        ''
-	},
     'add': {
-        '': ''
+        'success': 'was added!',
+        'failure': 'Failed to add file...'
     }
 }
 
@@ -74,35 +71,26 @@ class CliPlay(Cmd):
 
         if args:
             for arg in args.split(' '):
-                response = get_arg_response('list', arg)
                 audio_files = filter_audio_files(flist)
                 if list(audio_files):
                     print(*audio_files, sep='\n')
                 else:
-                    print(response['error'])
+                    print('No audio files here...')
         else:
-            filter_audio_files(*flist, sep='\n')
+            print(*flist, sep='\n')
 
     def do_add(self, args):
+        """ """
         # Want to check if its in the cache
+        # Separate files? Splice
         flist = get_dir_cache()
-        aflist = list(filter_audio_files(flist))
 
         if args:
-            for arg in args.split(' '):
-                if arg == 'add':
-                    pass
-                elif arg in aflist:
-
-
-
-
-
-                response = get_arg_response('add', arg)
-                audio_files = filter_audio_files(flist)
-
-
-
+            response = ACTION_TREE['add']['success']
+            self.add_to_workinglist(args)
+            print('{} '.format(args) + response)
+        else: # No file was passed in
+            print(ACTION_TREE['add']['failure'])
 
     def do_quit(self, args):
         """ Generic quit function for now """
