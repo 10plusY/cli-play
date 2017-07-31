@@ -60,20 +60,16 @@ class CliPlay(Cmd):
         """ """
         flist = get_dir_cache()
 
-        def print_dir_list(l):
-            for a in l:
-                print(a)
-
         if args:
             for arg in args.split(' '):
                 response = get_arg_response('list', arg)
                 audio_files = filter_audio_files(flist)
                 if list(audio_files):
-                    print_dir_list(audio_files)
+                    print(*audio_files, sep='\n')
                 else:
                     print(response['error'])
         else:
-            print_dir_list(flist)
+            filter_audio_files(*flist, sep='\n')
 
     def do_quit(self, args):
         """ Generic quit function for now """
