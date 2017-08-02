@@ -4,6 +4,8 @@ from cmd import Cmd
 
 import os
 import sndhdr
+import sys
+from IO import StringIO
 
 cache = None
 
@@ -46,10 +48,24 @@ ACTION_TREE = {
     }
 }
 
-def get_arg_response(action, arg):
-    response = ACTION_TREE.get(action, None)
-    return response
+def hdr_to_audio_list():
+    mainout = sys.stdout
 
+    stream = StringIO()
+
+    sys.stdout = stream
+    sndhdr.test()
+
+    sys.stdout = mainout
+    resultlist = stream.getvalue().split('\n')
+    audiofiles = []
+
+    for res in [_ for _ in resultlist if _]:
+        name, test = res.split(": ", maxsplit=1)
+        if test.startswith("SndHeaders"):
+            audiofiles.append(name)
+
+    return audiofiles
 
 class CliPlay(Cmd):
     # Init
@@ -84,7 +100,7 @@ class CliPlay(Cmd):
         action = ACTION_TREE['list']
         if args:
             for arg in args.split(' '):
-                if action[arg]:
+                try:
                     response = action[arg]
                     audio_files = filter_audio_files(flist)
 
@@ -92,6 +108,8 @@ class CliPlay(Cmd):
                         print(*audio_files, sep='\n')
                     else:
                         print(response['failure'])
+                except:
+                    pass
         else:
             action['default']['success'](flist)
 
@@ -102,16 +120,15 @@ class CliPlay(Cmd):
         flist = get_dir_cache()
 
         if args:
-            if args not in list(filter_audio_files(flist)):
-                response = ACTION_TREE['add']['failure']
-                print(response)
-            else:
-                response = ACTION_TREE['add']['success']
-                self.add_to_main_list(args)
-                print('{} '.format(args) + response)
-        else: # No file was passed in
-            response = ACTION_TREE['add']['failure']
-            print(response)
+            tokens = args.split(' ')
+            if sndhdr.what(tokens[0]):
+                # ADD MESSAGES
+                print('Impromper format; {} is not a playlist'.format(tokens[0]))
+            elif tokens[0] in self.playlists:
+
+                self.playlists.extend(tokens[1:])
+        else:
+            print(ACTION_TREE['add']['failure'])
 
     def do_quit(self, args):
         """ Generic quit function for now """
