@@ -83,6 +83,10 @@ class CliPlay(Cmd):
         Cmd.__init__(self)
 
         self.workinglist = []
+        self.playlists = []
+
+    def get_playlists(self):
+        return self.playlists
 
     # Attrs
     def set_prompt(self, prompt):
@@ -101,7 +105,10 @@ class CliPlay(Cmd):
 
     # Do Methods
     def do_list(self, args):
-        """ List files in dir """
+        """ List files in dir
+
+            :param args - arg string
+        """
         if args:
             for arg in args.split(' '):
                 if arg == 'audio':
@@ -116,20 +123,26 @@ class CliPlay(Cmd):
 
     def do_add(self, args):
         """ """
-        # Want to check if its in the cache
-        # Separate files? Splice
-        flist = get_dir_cache()
-
         if args:
-            tokens = args.split(' ')
-            if sndhdr.what(tokens[0]):
-                # ADD MESSAGES
-                print('Impromper format; {} is not a playlist'.format(tokens[0]))
-            elif tokens[0] in self.playlists:
+            all_args = args.split(' ')
+            first_arg = all_args.pop(0)
+            other_args = all_args
 
-                self.playlists.extend(tokens[1:])
+            audiolist = hdr_to_audio_list()
+            audioargs = filter(lambda arg: arg not in hdr_to_audio_list(), other_args)
+
+            if list(audiolist) == list(audioargs):
+                if first_arg not in self.playlists:
+                    self.playlists.append(first_arg)
+                    print("Creating playlist {}...".format(self.get_playlists()[-1]))
+                else:
+                # add to default dict
+
+            else:
+                not_audiofiles = list(set(audiolist) - set(audioargs))
+                print("Add failed...\nFiles {} not added...".format(not_audiofiles.join(', ')))
         else:
-            print(ACTION_TREE['add']['failure'])
+            print("No playlist and argument given\nUsage: add <PLAYLIST> [TRACK1 TRACK2 ...]")
 
     def do_quit(self, args):
         """ Generic quit function for now """
