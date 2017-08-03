@@ -1,4 +1,4 @@
 # Remnants
 *.pyc
 __pychache__/
-
+*.wav
