@@ -6,6 +6,7 @@ import os
 import sndhdr
 import sys
 from io import BytesIO
+from collections import defaultdict
 
 cache = None
 
@@ -83,7 +84,7 @@ class CliPlay(Cmd):
         Cmd.__init__(self)
 
         self.workinglist = []
-        self.playlists = []
+        self.playlists = defaultdict(list)
 
     def get_playlists(self):
         return self.playlists
@@ -133,11 +134,9 @@ class CliPlay(Cmd):
 
             if list(audiolist) == list(audioargs):
                 if first_arg not in self.playlists:
-                    self.playlists.append(first_arg)
-                    print("Creating playlist {}...".format(self.get_playlists()[-1]))
-                else:
-                # add to default dict
+                    print("Creating playlist {}...".format(first_arg))
 
+                playlists[first_arg].extend(audioargs)
             else:
                 not_audiofiles = list(set(audiolist) - set(audioargs))
                 print("Add failed...\nFiles {} not added...".format(not_audiofiles.join(', ')))
