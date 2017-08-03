@@ -1,14 +1,14 @@
 from __future__ import print_function
 
 from cmd import Cmd
+from collections import defaultdict
+from io import BytesIO
 
-import os
 import sndhdr
 import sys
-from io import BytesIO
-from collections import defaultdict
+import os
 
-cache = None
+CACHE = None
 
 HDR_NO_HEADER = 'None'
 HDR_RECURSING = 'recursing down:'
@@ -16,45 +16,13 @@ HDR_DIRECTORY = '*** directory (use -r) ***'
 
 BAD_HDR_TESTS = (HDR_NO_HEADER, HDR_RECURSING, HDR_DIRECTORY)
 
-
 def prompt_string():
     """ Default is cwd base """
     return '(Folder: {}): '.format(os.path.basename(os.getcwd()))
 
 def get_dir_cache():
-    """ Return cache or redo dir listing.
-        Allows generator use.
-    """
-    return cache or os.listdir(os.getcwd())
-
-def filter_audio_files(flist):
-    for fname in flist:
-        try:
-            if sndhdr.what(fname):
-                yield fname
-
-        # Issues with directories - just skip it
-        except:
-            pass
-
-def log_list(flist):
-    print(*flist, sep='\n')
-
-ACTION_TREE = {
-    'list': {
-        'default' : {
-            'success': log_list
-        },
-        'audio': {
-            'success': log_list,
-            'failure': 'No audio files here...'
-        }
-    },
-    'add': {
-        'success': 'was added!',
-        'failure': 'Failed to add file...'
-    }
-}
+    """ Return cache or redo dir listing """
+    return CACHE or os.listdir(os.getcwd())
 
 def hdr_to_audio_list():
     """ Returns list of audio files using the hdrtests """
@@ -77,7 +45,7 @@ def hdr_to_audio_list():
     return files
 
 class CliPlay(Cmd):
-    # Init
+    """ Object representing the command line tool playlist creator """
     def __init__(self):
         """ Shell params set here """
 
