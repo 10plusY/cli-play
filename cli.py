@@ -5,11 +5,18 @@ from cmd import Cmd
 import os
 import sndhdr
 import sys
-from IO import StringIO
+from io import BytesIO
 
 cache = None
 
-def get_prompt_string():
+HDR_NO_HEADER = 'None'
+HDR_RECURSING = 'recursing down:'
+HDR_DIRECTORY = '*** directory (use -r) ***'
+
+BAD_HDR_TESTS = (HDR_NO_HEADER, HDR_RECURSING, HDR_DIRECTORY)
+
+
+def prompt_string():
     """ Default is cwd base """
     return '(Folder: {}): '.format(os.path.basename(os.getcwd()))
 
@@ -49,23 +56,24 @@ ACTION_TREE = {
 }
 
 def hdr_to_audio_list():
+    """ Returns list of audio files using the hdrtests """
     mainout = sys.stdout
 
-    stream = StringIO()
+    stream = BytesIO()
 
     sys.stdout = stream
     sndhdr.test()
 
     sys.stdout = mainout
     resultlist = stream.getvalue().split('\n')
-    audiofiles = []
+    files = []
 
     for res in [_ for _ in resultlist if _]:
-        name, test = res.split(": ", maxsplit=1)
-        if test.startswith("SndHeaders"):
-            audiofiles.append(name)
+        name, test = res.split(": ")
+        if test not in BAD_HDR_TESTS:
+            files.append(name.strip('./'))
 
-    return audiofiles
+    return files
 
 class CliPlay(Cmd):
     # Init
@@ -86,32 +94,25 @@ class CliPlay(Cmd):
     # Hooks
     def preloop(self):
         self.intro = 'WELCOME TO CLI-PLAY\n'
-        self.set_prompt(get_prompt_string())
+        self.set_prompt(prompt_string())
 
     def postloop(self):
         pass
 
     # Do Methods
     def do_list(self, args):
-        """ """
-        # Need Decorator
-        flist = get_dir_cache()
-
-        action = ACTION_TREE['list']
+        """ List files in dir """
         if args:
             for arg in args.split(' '):
-                try:
-                    response = action[arg]
-                    audio_files = filter_audio_files(flist)
+                if arg == 'audio':
+                    audiolist = hdr_to_audio_list()
 
-                    if list(audio_files):
-                        print(*audio_files, sep='\n')
+                    if audiolist:
+                        print(*audiolist, sep='\n')
                     else:
-                        print(response['failure'])
-                except:
-                    pass
+                        print('Failed to add file...')
         else:
-            action['default']['success'](flist)
+            print(*get_dir_cache(), sep='\n')
 
     def do_add(self, args):
         """ """
