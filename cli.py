@@ -7,6 +7,8 @@ from io import BytesIO
 import sndhdr
 import sys
 import os
+import re
+
 
 CACHE = None
 
@@ -51,8 +53,7 @@ class CliPlay(Cmd):
 
         Cmd.__init__(self)
 
-        self.workinglist = []
-        self.playlists = defaultdict(list)
+        self._playlists = defaultdict(list)
 
     def get_playlists(self):
         return self.playlists
@@ -61,57 +62,38 @@ class CliPlay(Cmd):
     def set_prompt(self, prompt):
         self.prompt = prompt
 
-    def add_to_main_list(self, fname):
-        self.workinglist.append(fname)
-
     # Hooks
     def preloop(self):
         self.intro = 'WELCOME TO CLI-PLAY\n'
         self.set_prompt(prompt_string())
 
-    def postloop(self):
-        pass
-
-    # Do Methods
-    def do_list(self, args):
+    # CLI Methods
+    def do_list(self, arg):
         """ List files in dir
 
             :param args - arg string
         """
-        if args:
-            for arg in args.split(' '):
-                if arg == 'audio':
-                    audiolist = hdr_to_audio_list()
-
-                    if audiolist:
-                        print(*audiolist, sep='\n')
-                    else:
-                        print('Failed to add file...')
-        else:
-            print(*get_dir_cache(), sep='\n')
-
-    def do_add(self, args):
-        """ """
-        if args:
-            all_args = args.split(' ')
-            first_arg = all_args.pop(0)
-            other_args = all_args
-
+        if arg and arg == '-a':
             audiolist = hdr_to_audio_list()
 
-            # If all of the args are audio, they can be added
-            if all(_ in audiolist for _ in other_args):
-                
-                if self.get_playlists().get(first_arg) is None:
-                    print("Creating playlist {}...".format(first_arg))
-
-                self.playlists[first_arg].extend(other_args)
+            if audiolist:
+                print(*audiolist, sep='\n')
             else:
-                audioargs = filter(lambda arg: arg in hdr_to_audio_list(), other_args)
-                not_audiofiles = list(set(audioargs).symmetric_difference(set(other_args)))
-                print("Add failed...\nFiles {} not added...".format(', '.join(not_audiofiles)))
+                print('No audio files in this dir...')
+
+            return
+
+        print(*get_dir_cache(), sep='\n')
+
+    def do_add(self, args):
+        if args:
+            pass
         else:
-            print("No playlist and argument given\nUsage: add <PLAYLIST> [TRACK1 TRACK2 ...]")
+            print("No playlist/tracks specificied. Cannot add...")
+
+    def do_something(self, arg):
+        pass
+
 
     def do_quit(self, args):
         """ Generic quit function for now """
