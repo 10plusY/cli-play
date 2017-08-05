@@ -98,16 +98,18 @@ class CliPlay(Cmd):
             other_args = all_args
 
             audiolist = hdr_to_audio_list()
-            audioargs = filter(lambda arg: arg not in hdr_to_audio_list(), other_args)
+            
+            audioargs = filter(lambda arg: arg in hdr_to_audio_list(), other_args)
 
-            if list(audiolist) == list(audioargs):
-                if first_arg not in self.playlists:
+            # If all of the args are audio, they can be added
+            if all(_ in audiolist for _ in other_args):
+                if not self.playlists[first_arg]:
                     print("Creating playlist {}...".format(first_arg))
 
-                playlists[first_arg].extend(audioargs)
+                self.playlists[first_arg].extend(other_args)
             else:
-                not_audiofiles = list(set(audiolist) - set(audioargs))
-                print("Add failed...\nFiles {} not added...".format(not_audiofiles.join(', ')))
+                not_audiofiles = list(set(audioargs).symmetric_difference(set(other_args)))
+                print("Add failed...\nFiles {} not added...".format(', '.join(not_audiofiles)))
         else:
             print("No playlist and argument given\nUsage: add <PLAYLIST> [TRACK1 TRACK2 ...]")
 
