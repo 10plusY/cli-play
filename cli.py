@@ -58,11 +58,16 @@ class CliPlay(Cmd):
         self.parser = argparse.ArgumentParser()
         subparsers = self.parser.add_subparsers()
 
-        list_parser = subparsers.add_parser("list")
-        list_parser.add_argument("-a", action='store_true')
+        self.register_list_parser(subparsers)
+        self.register_add_parser(subparsers)
+
+    def register_list_parser(self, sub):
+        list_parser = sub.add_parser("list")
+        list_parser.add_argument("-a", action="store_true")
         list_parser.set_defaults(func=self._do_list)
 
-        add_parser = subparsers.add_parser("add")
+    def register_add_parser(self, sub):
+        add_parser = sub.add_parser("add")
         add_parser.add_argument("-p", required=True)
         add_parser.add_argument("-t", nargs='*')
         add_parser.set_defaults(func=self._do_add)
@@ -87,10 +92,10 @@ class CliPlay(Cmd):
         else:
             if self.playlists.get(args.p) is None:
                 print("Creating playlist %s..." % args.p)
-            else:
-                print("Adding tracks %s to playlist %s" % ((', '.join(args.t), args.p)))
 
             new_tracks = filter(lambda t: t not in self.playlists[args.p], args.t)
+
+            print("Adding tracks %s to playlist %s" % ((', '.join(new_tracks), args.p)))
 
             self.playlists[args.p].extend(new_tracks)
 
