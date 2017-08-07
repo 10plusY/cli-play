@@ -17,6 +17,8 @@ HDR_NO_HEADER = 'None'
 HDR_RECURSING = 'recursing down:'
 HDR_DIRECTORY = '*** directory (use -r) ***'
 
+CLI_INTRO = 'WELCOME TO CLI PLAY\n'
+
 BAD_HDR_TESTS = (HDR_NO_HEADER, HDR_RECURSING, HDR_DIRECTORY)
 
 def prompt_string():
@@ -64,6 +66,10 @@ class CliPlay(Cmd):
         add_parser.add_argument("-p", required=True)
         add_parser.add_argument("-t", nargs='*')
         add_parser.set_defaults(func=self._do_add)
+
+    def preloop(self):
+        self.intro = CLI_INTRO
+        self.prompt = prompt_string()
 
     def _do_list(self, args):
         if args.a:
