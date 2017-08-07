@@ -51,17 +51,35 @@ class CliPlay(Cmd):
     def __init__(self, **kwargs):
         Cmd.__init__(self, **kwargs)
 
+        self.playlists = defaultdict(list)
+
         self.parser = argparse.ArgumentParser()
         subparsers = self.parser.add_subparsers()
+
         list_parser = subparsers.add_parser("list")
         list_parser.add_argument("-a", action='store_true')
         list_parser.set_defaults(func=self._do_list)
+
+        add_parser = subparsers.add_parser("add")
+        add_parser.add_argument("-p", nargs='?')
+        add_parser.set_defaults(func=self._do_add)
 
     def _do_list(self, args):
         if args.a:
             print(*hdr_to_audio_list(), sep='\n')
         else:
             print(*get_dir_cache(), sep='\n')
+
+    def _do_add(self, args):
+        if args.p:
+            self.playlists[args.p]
+            print("New playlist %s created..." % args.p)
+        else:
+            print("No playlist...")
+
+    def do_quit(self, args):
+        print("Shutting down...")
+        raise SystemExit
 
     def default(self, line):
         args = self.parser.parse_args(shlex.split(line))
