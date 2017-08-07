@@ -61,7 +61,7 @@ class CliPlay(Cmd):
         list_parser.set_defaults(func=self._do_list)
 
         add_parser = subparsers.add_parser("add")
-        add_parser.add_argument("-p")
+        add_parser.add_argument("-p", required=True)
         add_parser.add_argument("-t", nargs='*')
         add_parser.set_defaults(func=self._do_add)
 
@@ -72,24 +72,21 @@ class CliPlay(Cmd):
             print(*get_dir_cache(), sep='\n')
 
     def _do_add(self, args):
-        if args.p and args.t:
-            if not self.playlists[args.p]:
-                print("Creating new playlist %s..." % args.p)
-
-            print("Adding tracks %s to playlist %s..." % (','.join(args.t), args.p))
+        if not args.t:
+            if self.playlists.get(args.p) is None:
+                print("Creating playlist %s..." % args.p)
+                self.playlists[args.p]
+            else:
+                print("Playlist %s already exists..." % args.p)
+        else:
+            if self.playlists.get(args.p) is None:
+                print("Creating playlist %s..." % args.p)
+            else:
+                print("Adding tracks %s to playlist %s" % ((', '.join(args.t), args.p)))
 
             new_tracks = filter(lambda t: t not in self.playlists[args.p], args.t)
 
             self.playlists[args.p].extend(new_tracks)
-
-            return
-        elif args.p and not args.t:
-
-            print(2)
-            return
-        else:
-            print(3)
-            return
 
     def do_quit(self, args):
         print("Shutting down...")
