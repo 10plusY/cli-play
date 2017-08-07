@@ -8,7 +8,8 @@ import sndhdr
 import sys
 import os
 import re
-
+import shlex
+import argparse
 
 CACHE = None
 
@@ -47,63 +48,87 @@ def hdr_to_audio_list():
     return files
 
 class CliPlay(Cmd):
-    """ Object representing the command line tool playlist creator """
-    def __init__(self):
-        """ Shell params set here """
+    def __init__(self, **kwargs):
+        Cmd.__init__(self, **kwargs)
 
-        Cmd.__init__(self)
+        self.parser = argparse.ArgumentParser()
+        subparsers = self.parser.add_subparsers()
+        list_parser = subparsers.add_parser("list")
+        list_parser.add_argument("-a", action='store_true')
+        list_parser.set_defaults(func=self._do_list)
 
-        self._playlists = defaultdict(list)
-
-    def get_playlists(self):
-        return self.playlists
-
-    # Attrs
-    def set_prompt(self, prompt):
-        self.prompt = prompt
-
-    # Hooks
-    def preloop(self):
-        self.intro = 'WELCOME TO CLI-PLAY\n'
-        self.set_prompt(prompt_string())
-
-    # CLI Methods
-    def do_list(self, arg):
-        """ List files in dir
-
-            :param args - arg string
-        """
-        if arg and arg == '-a':
-            audiolist = hdr_to_audio_list()
-
-            if audiolist:
-                print(*audiolist, sep='\n')
-            else:
-                print('No audio files in this dir...')
-
-            return
-
-        print(*get_dir_cache(), sep='\n')
-
-    def do_add(self, args):
-        if args:
-            pass
+    def _do_list(self, args):
+        if args.a:
+            print(*hdr_to_audio_list(), sep='\n')
         else:
-            print("No playlist/tracks specificied. Cannot add...")
+            print(*get_dir_cache(), sep='\n')
 
-    def do_something(self, arg):
-        pass
+    def default(self, line):
+        args = self.parser.parse_args(shlex.split(line))
+
+        try:
+            args.func(args)
+        except:
+            Cmd.default(self, line)
+
+play = CliPlay()
+play.cmdloop()
 
 
-    def do_quit(self, args):
-        """ Generic quit function for now """
 
-        print("Shutting down...")
-
-        raise SystemExit
-
-    # Help Methods
-
-if __name__ == '__main__':
-    play = CliPlay()
-    play.cmdloop()
+# class CliPlay(Cmd):
+#     """ Object representing the command line tool playlist creator """
+#     def __init__(self):
+#         """ Shell params set here """
+#
+#         Cmd.__init__(self)
+#
+#         self._playlists = defaultdict(list)
+#
+#     def get_playlists(self):
+#         return self.playlists
+#
+#     # Attrs
+#     def set_prompt(self, prompt):
+#         self.prompt = prompt
+#
+#     # Hooks
+#     def preloop(self):
+#         self.intro = 'WELCOME TO CLI-PLAY\n'
+#         self.set_prompt(prompt_string())
+#
+#     # CLI Methods
+#     def do_list(self, arg):
+#         """ List files in dir
+#
+#             :param args - arg string
+#         """
+#         if arg and arg == '-a':
+#             audiolist = hdr_to_audio_list()
+#
+#             if audiolist:
+#                 print(*audiolist, sep='\n')
+#             else:
+#                 print('No audio files in this dir...')
+#
+#             return
+#
+#         print(*get_dir_cache(), sep='\n')
+#
+#     def do_add(self, args):
+#         if args:
+#             pass
+#         else:
+#             print("No playlist/tracks specificied. Cannot add...")
+#
+#     def do_quit(self, args):
+#         """ Generic quit function for now """
+#
+#         print("Shutting down...")
+#
+#         raise SystemExit
+#
+#     # Help Methods
+#
+# play = CliPlay()
+# play.cmdloop()
