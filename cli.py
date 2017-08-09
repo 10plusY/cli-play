@@ -93,9 +93,14 @@ class CliPlay(Cmd):
             if self.playlists.get(args.p) is None:
                 print("Creating playlist %s..." % args.p)
 
-            new_tracks = filter(lambda t: t not in self.playlists[args.p], args.t)
+            new_entries = filter(lambda t: t not in self.playlists[args.p], args.t)
+            new_tracks = filter(lambda t: t not in hdr_to_audio_list(), new_entries)
 
             print("Adding tracks %s to playlist %s" % ((', '.join(new_tracks), args.p)))
+
+            if new_entries != new_tracks:
+                print("Couldn't add tracks %s" % (', '.join(list(set(new_entries) - set(new_tracks)))))
+                print("Not audio tracks...")
 
             self.playlists[args.p].extend(new_tracks)
 
