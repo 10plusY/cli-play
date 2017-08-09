@@ -60,6 +60,7 @@ class CliPlay(Cmd):
 
         self.register_list_parser(subparsers)
         self.register_add_parser(subparsers)
+        self.register_move_parser(subparsers)
 
     def register_list_parser(self, sub):
         list_parser = sub.add_parser("list")
@@ -71,6 +72,10 @@ class CliPlay(Cmd):
         add_parser.add_argument("-p", required=True)
         add_parser.add_argument("-t", nargs='*')
         add_parser.set_defaults(func=self._do_add)
+
+    def register_move_parser(self, sub):
+        move_parser = sub.add_parser("move")
+        move_parser.set_defaults(func=self._do_move)
 
     def preloop(self):
         self.intro = CLI_INTRO
@@ -103,6 +108,9 @@ class CliPlay(Cmd):
                 print("Not audio tracks...")
 
             self.playlists[args.p].extend(new_tracks)
+
+    def _do_move(self, args):
+        print("Move")
 
     def do_quit(self, args):
         print("Shutting down...")
