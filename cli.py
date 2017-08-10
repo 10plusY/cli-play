@@ -139,6 +139,18 @@ class CliPlay(Cmd):
             print("Up/Down")
         elif args.u:
             print("Up")
+            relative_dir = '/'.join([".."] * args.u)
+            for root, dirs, files in os.walk(relative_dir):
+                level = len(root.split("/")) - 1
+                if level <= args.d:
+                    for f in files:
+                        full_path = cwd + root.strip(relative_dir + '.') + '/' + f
+                        try:
+                            if sndhdr.what(full_path): print("LEVEL %s:" % level, f)
+                        except:
+                            pass
+                    else:
+                        break
         elif args.d:
             for root, dirs, files in os.walk("."):
                 level = len(root.split("/")) - 1
