@@ -140,9 +140,10 @@ class CliPlay(Cmd):
         elif args.u:
             level_path = '/'.join([".."] * args.u)
             abs_path = os.path.abspath(level_path)
+            abs_slash_count = len(abs_path.split('/'))
             for root, dirs, files in os.walk(abs_path):
                 level = len(root.split("/")) - 1
-                if level <= args.d:
+                if level <= args.d + abs_slash_count:
                     for f in files:
                         full_path = cwd + root.strip(relative_dir + '.') + '/' + f
                         try:
