@@ -120,25 +120,17 @@ class CliPlay(Cmd):
 
     def _do_remove(self, args):
         if self.playlists.get(args.p) is None:
-            print("Can't delete%splaylist %s. Doesn't exist..." % ((" tracks %s from " % ', '.join(args.t)) if args.t else " ", args.p))
+            print("Can't remove%splaylist %s. Doesn't exist..." % ((" tracks %s from " % ', '.join(args.t)) if args.t else " ", args.p))
         elif args.t:
-            print("Removing %s from playlist %s..." % (args.t, args.p))
+            for t in args.t:
+                if t in self.playlists[args.p]:
+                    print("Removing %s..." % t)
+                    self.playlists[args.p].remove(t)
+                else:
+                    print("%s not in playlist...")
         else:
             print("Removing playlist %s..." % args.p)
-
-
-        # if not args.t:
-        #     if self.playlists.get(args.p) is None:
-        #         print("Can't delete playlist %s. Doesn't exist..." % args.p)
-        #     else:
-        #         del self.playlists[args.p]
-        #         print("Playlist %s deleted..." % args.p)
-        # else:
-        #     if self.playlists.get(args.p) is None:
-        #         print("Can't delete tracks from playlist %s. Doesn't exist..." % args.p)
-
-
-
+            del self.playlists[args.p]
 
     # LOOK UP...LOOK DOWN
     def _do_move(self, args):
