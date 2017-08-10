@@ -60,6 +60,7 @@ class CliPlay(Cmd):
 
         self.register_list_parser(subparsers)
         self.register_add_parser(subparsers)
+        self.register_remove_parser(subparsers)
         self.register_move_parser(subparsers)
 
     def register_list_parser(self, sub):
@@ -73,8 +74,16 @@ class CliPlay(Cmd):
         add_parser.add_argument("-t", nargs='*')
         add_parser.set_defaults(func=self._do_add)
 
+    def register_remove_parser(self, sub):
+        remove_parser = sub.add_parser("remove")
+        remove_parser.add_argument("-p", required=True)
+        remove_parser.add_argument("-t", nargs='*')
+        remove_parser.set_defaults(func=self._do_remove)
+
     def register_move_parser(self, sub):
         move_parser = sub.add_parser("move")
+        move_parser.add_argument("-u", action="store_true")
+        move_parser.add_argument("-d", action="store_true")
         move_parser.set_defaults(func=self._do_move)
 
     def preloop(self):
@@ -109,8 +118,39 @@ class CliPlay(Cmd):
 
             self.playlists[args.p].extend(new_tracks)
 
+    def _do_remove(self, args):
+        if self.playlists.get(args.p) is None:
+            print("Can't delete%splaylist %s. Doesn't exist..." % ((" tracks %s from " % ', '.join(args.t)) if args.t else " ", args.p))
+        elif args.t:
+            print("Removing %s from playlist %s..." % (args.t, args.p))
+        else:
+            print("Removing playlist %s..." % args.p)
+
+
+        # if not args.t:
+        #     if self.playlists.get(args.p) is None:
+        #         print("Can't delete playlist %s. Doesn't exist..." % args.p)
+        #     else:
+        #         del self.playlists[args.p]
+        #         print("Playlist %s deleted..." % args.p)
+        # else:
+        #     if self.playlists.get(args.p) is None:
+        #         print("Can't delete tracks from playlist %s. Doesn't exist..." % args.p)
+
+
+
+
+    # LOOK UP...LOOK DOWN
     def _do_move(self, args):
-        print("Move")
+        if args.u and args.d:
+            # TODO: Raise error
+            print("Cannot move up and down...")
+        elif args.u:
+            print("Up")
+        elif args.d:
+            print("Down")
+        else:
+            print("Moyes")
 
     def do_quit(self, args):
         print("Shutting down...")
