@@ -133,15 +133,26 @@ class CliPlay(Cmd):
             del self.playlists[args.p]
 
     def _do_look(self, args):
-        print(args)
+        cwd = os.getcwd()
+
         if args.u and args.d:
             print("Up/Down")
         elif args.u:
             print("Up")
         elif args.d:
-            print("Down")
+            for root, dirs, files in os.walk("."):
+                level = len(root.split("/")) - 1
+                if level <= args.d:
+                    for f in files:
+                        full_path = cwd + root.strip('.') + '/' + f
+                        try:
+                            if sndhdr.what(full_path): print("LEVEL %s:" % level, f)
+                        except:
+                            pass
+                else:
+                    break
         else:
-            print("Moyes")
+            print("No args given...")
 
     def do_quit(self, args):
         print("Shutting down...")
