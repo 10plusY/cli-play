@@ -11,6 +11,8 @@ import re
 import shlex
 import argparse
 
+import utils
+
 CACHE = None
 
 HDR_NO_HEADER = 'None'
@@ -133,39 +135,15 @@ class CliPlay(Cmd):
             del self.playlists[args.p]
 
     def _do_look(self, args):
-        cwd = os.getcwd()
-
-        if args.u and args.d:
-            print("Up/Down")
-        elif args.u:
-            level_path = '/'.join([".."] * args.u)
-            abs_path = os.path.abspath(level_path)
-            abs_slash_count = len(abs_path.split('/'))
-            for root, dirs, files in os.walk(abs_path):
-                level = len(root.split("/")) - 1
-                if level <= args.d + abs_slash_count:
-                    for f in files:
-                        full_path = cwd + root.strip(relative_dir + '.') + '/' + f
-                        try:
-                            if sndhdr.what(full_path): print("LEVEL %s:" % level, f)
-                        except:
-                            pass
-                    else:
-                        break
+        if args.d and args.u:
+            print(*utils.enqueue_tree(args.d), sep='\n')
+            print(*utils.enqueue_tree(args.u, down=False), sep='\n')
         elif args.d:
-            for root, dirs, files in os.walk("."):
-                level = len(root.split("/")) - 1
-                if level <= args.d:
-                    for f in files:
-                        full_path = cwd + root.strip('.') + '/' + f
-                        try:
-                            if sndhdr.what(full_path): print("LEVEL %s:" % level, f)
-                        except:
-                            pass
-                else:
-                    break
+            print(*utils.enqueue_tree(args.d), sep='\n')
+        elif args.u:
+            print(*utils.enqueue_tree(args.u, down=False), sep='\n')
         else:
-            print("No args given...")
+            print("No args given")
 
     def do_quit(self, args):
         print("Shutting down...")
