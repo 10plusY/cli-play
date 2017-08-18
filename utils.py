@@ -55,20 +55,6 @@ def walk_up(level):
     """
     return walk_by_level('/'.join(['..'] * level), level)
 
-def look_tree(level):
-    """
-        Returns level tree starting up or down based on the parity
-        of the level.
-
-        :param level - signed number of steps to walk the tree
-    """
-    if level > 0:
-        return walk_up(abs(level))
-    elif level < 0:
-        return walk_down(abs(level))
-    else:
-        pass
-
 def enqeue_tree(level):
     """
         Takes signed level and returns a queue with the files
