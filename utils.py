@@ -2,23 +2,25 @@ import os
 
 from collections import deque
 
-def walk_level(path, level):
+def walk_by_level(path, level):
     """
-    Walks the file system up to a certain level/depth
 
-    i.e. For a directory tree
+        Walks the file system up to a certain level/depth
 
-    -- /
-        -- Foo
-        -- Bar
-            -- Qux
-                -- Quux
-                -- Corge
+        i.e. For a directory tree
 
-    walk_level('/', 2) returns ('/', '/Foo', '/Bar', '/Bar/Qux')
+        -- /
+            -- Foo
+            -- Bar
+                -- Qux
+                    -- Quux
+                    -- Corge
 
-    :param path - path to form the root of the tree
-    :param level - number of steps to go down the tree
+        walk_by_level('/', 2) returns ('/', '/Foo', '/Bar', '/Bar/Qux')
+
+        :param path - path to form the root of the tree
+        :param level - number of steps to go down the tree
+
     """
     path = os.path.abspath(path)
 
@@ -34,17 +36,35 @@ def walk_level(path, level):
 
 def walk_down(level):
     """
-    Walks downwards to certain level
 
-    :param level - number of steps to go down the tree
+        Walks downwards to certain level
+
+        :param level - number of steps to go down the tree
+
     """
-    return walk_level('.', level)
+    return walk_by_level('.', level)
 
 def walk_up(level):
     """
-    Walks downwards but first moves the root of the tree
-    a certain level up
 
-    :param level - number of steps to go down the tree
+        Walks downwards but first moves the root of the tree
+        a certain level up
+
+        :param level - number of steps to go down the tree
+
     """
-    return walk_level('/'.join(['..'] * level), level)
+    return walk_by_level('/'.join(['..'] * level), level)
+
+def look_tree(level):
+    """
+        Returns level tree starting up or down based on the parity
+        of the level.
+
+        :param level - signed number of steps to walk the tree
+    """
+    if level > 0:
+        return walk_up(abs(level))
+    elif level < 0:
+        return walk_down(abs(level))
+    else:
+        pass
