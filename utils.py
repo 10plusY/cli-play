@@ -68,3 +68,25 @@ def look_tree(level):
         return walk_down(abs(level))
     else:
         pass
+
+def enqeue_tree(level):
+    """
+        Takes signed level and returns a queue with the files
+        in the tree in the appropriate direction
+
+        :param level - signed number of steps to walk the tree (+ down/- up)
+    """
+    queue = deque()
+
+    tree = look_tree(level)
+
+    if level > 0:
+        for root, dirs, files in tree:
+            queue.append(root)
+    elif level < 0:
+        for root, dirs, files in tree:
+            queue.appendleft(root)
+    else:
+        pass
+
+    return queue
