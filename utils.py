@@ -1,6 +1,17 @@
 import os
+import sndhdr
 
 from collections import deque
+
+def build_audio_fs(start_path):
+    for root, dirs, files in os.walk(start_path):
+        for f in files:
+            try:
+                res = sndhdr.what(os.path.abspath(os.path.join(root, f)))
+            except PermissionError:
+                pass
+            finally:
+                if res: yield f
 
 def walk_by_level(path, level):
     """
