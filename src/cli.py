@@ -52,6 +52,7 @@ def hdr_to_audio_list():
     return files
 
 class CliPlay(Cmd):
+
     def __init__(self, **kwargs):
         Cmd.__init__(self, **kwargs)
 
@@ -122,7 +123,8 @@ class CliPlay(Cmd):
 
     def _do_remove(self, args):
         if self.playlists.get(args.p) is None:
-            print("Can't remove%splaylist %s. Doesn't exist..." % ((" tracks %s from " % ', '.join(args.t)) if args.t else " ", args.p))
+            print("Can't remove%splaylist %s. Doesn't exist..."
+                    % ((" tracks %s from " % ', '.join(args.t)) if args.t else " ", args.p))
         elif args.t:
             for t in args.t:
                 if t in self.playlists[args.p]:
@@ -157,5 +159,6 @@ class CliPlay(Cmd):
         except:
             Cmd.default(self, line)
 
-play = CliPlay()
-play.cmdloop()
+if __name__ == '__main__':
+    play = CliPlay()
+    play.cmdloop()
