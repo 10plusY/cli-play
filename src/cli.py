@@ -45,6 +45,13 @@ class ListCommand(Command):
                 except:
                     pass
 
+class LookCommand(Command):
+    def __init__(self, name, logging):
+        super('look', logging)
+
+    def call(args):
+        pass
+
 class UpdateCommand(Command):
     def __init__(self, name, logging):
         super('update', logging)
