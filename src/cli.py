@@ -63,14 +63,23 @@ class UpdateCommand(Command):
 
         return self._playlists
 
-    def add():
-        pass
-
-    def remove():
-        pass
-
     def call(args):
-        pass
+        playlist, track = args.p, args.t
+
+        new_entry = {playlist: None}
+
+        try:
+            current_playlist = self.playlists[playlist]
+        except KeyError:
+            new_entry[playlist] = []
+        else:
+            if arg.a:
+                new_entry[playlist] = current_playlist.append(track)
+            else:
+                new_entry[playlist] = current_playlist.remove(track)
+        finally:
+            self.playlists[playlist].update(new_entry)
+
 
 class CommandList(object):
     """ Command list object """
