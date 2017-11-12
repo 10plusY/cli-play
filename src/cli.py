@@ -13,23 +13,15 @@ import argparse
 
 import utils
 
-CACHE = None
 
-HDR_NO_HEADER = 'None'
-HDR_RECURSING = 'recursing down:'
-HDR_DIRECTORY = '*** directory (use -r) ***'
 
 CLI_INTRO = 'WELCOME TO CLI PLAY\n'
 
-BAD_HDR_TESTS = (HDR_NO_HEADER, HDR_RECURSING, HDR_DIRECTORY)
+
 
 def prompt_string():
     """ Default is cwd base """
     return '(Folder: {}): '.format(os.path.basename(os.getcwd()))
-
-def get_dir_cache():
-    """ Return cache or redo dir listing """
-    return CACHE or os.listdir(os.getcwd())
 
 def hdr_to_audio_list():
     """ Returns list of audio files using the hdrtests """
@@ -51,8 +43,43 @@ def hdr_to_audio_list():
 
     return files
 
-class CommandList(object):
+#
 
+class Command(object):
+    """ Command object """
+    def __init__(self, name, logging=False):
+        self.name = name
+        self.logging = logging
+
+    def call(**kwargs):
+        raise NotImplemented("Call must be implemented.")
+
+class ListCommand(Command):
+    def __init__(self, name, logging=False):
+        super('list', logging)
+
+    def call(**kwargs):
+        for f in os.listdir(os.getcwd()):
+            if 'a' in kwargs['cli_args']:
+                try:
+                    if isinstance(sndhdr.what(f), sndhdr.SndHeaders):
+                        print(f + '\n')
+                except:
+                    pass
+            else:
+                print(f + '\n')
+
+class AddCommand(Command):
+    pass
+
+class RemoveCommand(Command):
+    pass
+
+class LookCommand(Command):
+    pass
+
+class CommandList(object):
+    """ Command list object """
     @property
     def commands(self):
         if self._commands is None:
