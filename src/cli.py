@@ -51,6 +51,35 @@ def hdr_to_audio_list():
 
     return files
 
+class CommandList(object):
+
+    @property
+    def commands(self):
+        if self._commands is None:
+            self._commands = []
+
+            for atr in dir(self):
+                if callable(getattr(self, atr)):
+                    self._commands.append(atr)
+
+            for call in self._commands:
+                if call.startswith('__'):
+                    self._commands.append(call)
+
+        return self._commands
+
+    def list(self):
+        pass
+
+    def add(self):
+        pass
+
+    def remove(self):
+        pass
+
+    def look(self):
+        pass
+
 class CliPlay(Cmd):
 
     def __init__(self, **kwargs):
