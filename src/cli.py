@@ -2,7 +2,6 @@ from __future__ import print_function
 
 from cmd import Cmd
 from collections import defaultdict
-from io import BytesIO
 
 import sndhdr
 import sys
@@ -13,70 +12,58 @@ import argparse
 
 import utils
 
-
-
-CLI_INTRO = 'WELCOME TO CLI PLAY\n'
-
-
-
-def prompt_string():
-    """ Default is cwd base """
-    return '(Folder: {}): '.format(os.path.basename(os.getcwd()))
-
-def hdr_to_audio_list():
-    """ Returns list of audio files using the hdrtests """
-    mainout = sys.stdout
-
-    stream = BytesIO()
-
-    sys.stdout = stream
-    sndhdr.test()
-
-    sys.stdout = mainout
-    resultlist = stream.getvalue().split('\n')
-    files = []
-
-    for res in [_ for _ in resultlist if _]:
-        name, test = res.split(": ")
-        if test not in BAD_HDR_TESTS:
-            files.append(name.strip('./'))
-
-    return files
-
-#
-
 class Command(object):
     """ Command object """
     def __init__(self, name, logging=False):
         self.name = name
         self.logging = logging
 
-    def call(**kwargs):
-        raise NotImplemented("Call must be implemented.")
+    def call(args):
+        raise NotImplemented("Command call must be implemented.")
+
+# Organize the commands based on the data structures they manipulate.
 
 class ListCommand(Command):
-    def __init__(self, name, logging=False):
+    def __init__(self, name, logging):
         super('list', logging)
 
-    def call(**kwargs):
-        for f in os.listdir(os.getcwd()):
-            if 'a' in kwargs['cli_args']:
+    @property
+    def filelist(self):
+        if self._filelist is None:
+            self._filelist = os.listdir(os.getcwd())
+
+        return self._filelist
+
+    def call(args):
+        for f in self.filelist:
+            if not args.a:
+                print(f + '\n')
+            else:
                 try:
                     if isinstance(sndhdr.what(f), sndhdr.SndHeaders):
                         print(f + '\n')
                 except:
                     pass
-            else:
-                print(f + '\n')
 
-class AddCommand(Command):
-    pass
+class UpdateCommand(Command):
+    def __init__(self, name, logging):
+        super('update', logging)
 
-class RemoveCommand(Command):
-    pass
+    @property
+    def playlists(self):
+        if self._playlists = None:
+            self._playlists = defaultdict(list)
 
-class LookCommand(Command):
-    pass
+        return self._playlists
+
+    def add():
+        pass
+
+    def remove():
+        pass
+
+    def call(args):
+        pass
 
 class CommandList(object):
     """ Command list object """
@@ -146,8 +133,8 @@ class CliPlay(Cmd):
         look_parser.set_defaults(func=self._do_look)
 
     def preloop(self):
-        self.intro = CLI_INTRO
-        self.prompt = prompt_string()
+        self.intro = 'WELCOME TO CLI PLAY\n'
+        self.prompt = '(Folder: {}): '.format(os.path.basename(os.getcwd()))
 
     def _do_list(self, args):
         if args.a:
