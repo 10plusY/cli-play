@@ -53,26 +53,24 @@ class LookCommand(Command):
     def cached_tree(self):
         return None
 
-    # TODO: Do we want to call these?
-
-    def walk_to_level(self, path, level):
-        current_depth = os.path.abspath(path).count(os.path.sep)
-
-        for root, dirs, files in os.walk(path):
-            yield root, dirs, files
-
-            root_depth = root.count(os.path.sep)
-
-            if current_depth + level <= root_depth:
-                del dirs[:]
-
-    def walk_down(self, level):
-        self.walk_to_level('.', level)
-
-    def walk_up(self, level):
-        self.walk_to_level('/'.join(['..'] * level), level)
-
     def call(self, args):
+        def walk_to_level(path, level):
+            current_depth = os.path.abspath(path).count(os.path.sep)
+
+            for root, dirs, files in os.walk(path):
+                yield root, dirs, files
+
+                root_depth = root.count(os.path.sep)
+
+                if current_depth + level <= root_depth:
+                    del dirs[:]
+
+        def walk_down(level):
+            walk_to_level('.', level)
+
+        def walk_up(level):
+            walk_to_level('/'.join(['..'] * level), level)
+
         if args.d:
             walk_down(args.d)
 
