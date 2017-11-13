@@ -18,7 +18,7 @@ class Command(object):
         self.name = name
         self.logging = logging
 
-    def call(args):
+    def call(self, args):
         raise NotImplemented("Command call must be implemented.")
 
 # Organize the commands based on the data structures they manipulate.
@@ -34,7 +34,7 @@ class ListCommand(Command):
 
         return self._filelist
 
-    def call(args):
+    def call(self, args):
         for f in self.filelist:
             if not args.a:
                 print(f + '\n')
@@ -53,10 +53,10 @@ class LookCommand(Command):
     def cached_tree(self):
         return None
 
-    def walk_to_level(self, path, level):
-        a_path = os.path.abspath(path)
+    # TODO: Do we want to call these?
 
-        current_depth = a_path.count(os.path.sep)
+    def walk_to_level(self, path, level):
+        current_depth = os.path.abspath(path).count(os.path.sep)
 
         for root, dirs, files in os.walk(path):
             yield root, dirs, files
@@ -72,14 +72,12 @@ class LookCommand(Command):
     def walk_up(self, level):
         self.walk_to_level('/'.join(['..'] * level), level)
 
-    def call(args):
+    def call(self, args):
         if args.d:
             walk_down(args.d)
 
         if args.u:
             walk_up(args.u)
-
-
 
 class UpdateCommand(Command):
     def __init__(self, name, logging):
@@ -92,23 +90,19 @@ class UpdateCommand(Command):
 
         return self._playlists
 
-    def call(args):
+    def call(self, args):
         playlist, track = args.p, args.t
 
-        new_entry = {playlist: None}
-
-        try:
-            current_playlist = self.playlists[playlist]
-        except KeyError:
-            new_entry[playlist] = []
+        if not track:
+            self.playlists[playlist]
         else:
-            if arg.a:
-                new_entry[playlist] = current_playlist.append(track)
+            if args.a:
+                self.playlists[playlist].append(track)
             else:
-                new_entry[playlist] = current_playlist.remove(track)
-        finally:
-            self.playlists[playlist].update(new_entry)
-
+                try:
+                    self.playlists[playlist].remove(track)
+                except ValueError:
+                    pass
 
 class CommandList(object):
     """ Command list object """
