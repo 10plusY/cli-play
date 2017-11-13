@@ -4,13 +4,9 @@ from cmd import Cmd
 from collections import defaultdict
 
 import sndhdr
-import sys
 import os
-import re
 import shlex
 import argparse
-
-import utils
 
 class Command(object):
     """ Command object """
@@ -174,58 +170,23 @@ class CliPlay(Cmd):
         self.prompt = '(Folder: {}): '.format(os.path.basename(os.getcwd()))
 
     def _do_list(self, args):
-        if args.a:
-            print(*hdr_to_audio_list(), sep='\n')
-        else:
-            print(*get_dir_cache(), sep='\n')
-
-    def _do_add(self, args):
-        if not args.t:
-            if self.playlists.get(args.p) is None:
-                print("Creating playlist %s..." % args.p)
-                self.playlists[args.p]
-            else:
-                print("Playlist %s already exists..." % args.p)
-        else:
-            if self.playlists.get(args.p) is None:
-                print("Creating playlist %s..." % args.p)
-
-            new_entries = filter(lambda t: t not in self.playlists[args.p], args.t)
-            new_tracks = filter(lambda t: t not in hdr_to_audio_list(), new_entries)
-
-            print("Adding tracks %s to playlist %s" % ((', '.join(new_tracks), args.p)))
-
-            if new_entries != new_tracks:
-                print("Couldn't add tracks %s" % (', '.join(list(set(new_entries) - set(new_tracks)))))
-                print("Not audio tracks...")
-
-            self.playlists[args.p].extend(new_tracks)
-
-    def _do_remove(self, args):
-        if self.playlists.get(args.p) is None:
-            print("Can't remove%splaylist %s. Doesn't exist..."
-                    % ((" tracks %s from " % ', '.join(args.t)) if args.t else " ", args.p))
-        elif args.t:
-            for t in args.t:
-                if t in self.playlists[args.p]:
-                    print("Removing %s..." % t)
-                    self.playlists[args.p].remove(t)
-                else:
-                    print("%s not in playlist...")
-        else:
-            print("Removing playlist %s..." % args.p)
-            del self.playlists[args.p]
+        print('LIST')
+        # if args.a:
+        #     print(*hdr_to_audio_list(), sep='\n')
+        # else:
+        #     print(*get_dir_cache(), sep='\n')
 
     def _do_look(self, args):
-        if args.d and args.u:
-            print(*utils.enqueue_tree(args.d), sep='\n')
-            print(*utils.enqueue_tree(args.u, down=False), sep='\n')
-        elif args.d:
-            print(*utils.enqueue_tree(args.d), sep='\n')
-        elif args.u:
-            print(*utils.enqueue_tree(args.u, down=False), sep='\n')
-        else:
-            print("No args given")
+        print("LOOK")
+        # if args.d and args.u:
+        #     print(*utils.enqueue_tree(args.d), sep='\n')
+        #     print(*utils.enqueue_tree(args.u, down=False), sep='\n')
+        # elif args.d:
+        #     print(*utils.enqueue_tree(args.d), sep='\n')
+        # elif args.u:
+        #     print(*utils.enqueue_tree(args.u, down=False), sep='\n')
+        # else:
+        #     print("No args given")
 
     def do_quit(self, args):
         print("Shutting down...")
