@@ -50,28 +50,24 @@ class LookCommand(Command):
         return None
 
     def call(self, args):
-        def walk_to_level(path, level):
-            current_depth = os.path.abspath(path).count(os.path.sep)
+        level = args.l
 
-            for root, dirs, files in os.walk(path):
-                yield root, dirs, files
+        if level > 0:
+            walk_path = '.'
+        elif level < 0:
+            walk_path = '/'.join(['..'] * level)
+        else:
+            print("Can't walk 0 levels")
 
-                root_depth = root.count(os.path.sep)
+        depth = os.path.abspath(walk_path).count(os.path.sep)
 
-                if current_depth + level <= root_depth:
-                    del dirs[:]
+        for root, dirs, files in os.walk(walk_path):
+            yield root, dirs, files
 
-        def walk_down(level):
-            walk_to_level('.', level)
+            depth_from_root = root.count(os.path.sep)
 
-        def walk_up(level):
-            walk_to_level('/'.join(['..'] * level), level)
-
-        if args.d:
-            walk_down(args.d)
-
-        if args.u:
-            walk_up(args.u)
+            if depth + abs(level) <= depth_from_root:
+                del dirs[:]
 
 class UpdateCommand(Command):
     def __init__(self, name, logging):
@@ -79,7 +75,7 @@ class UpdateCommand(Command):
 
     @property
     def playlists(self):
-        if self._playlists = None:
+        if self._playlists is None:
             self._playlists = defaultdict(list)
 
         return self._playlists
@@ -171,10 +167,9 @@ class CliPlay(Cmd):
 
     def _do_list(self, args):
         print('LIST')
-        # if args.a:
-        #     print(*hdr_to_audio_list(), sep='\n')
-        # else:
-        #     print(*get_dir_cache(), sep='\n')
+
+    def _do_update(self, args):
+        print('update')
 
     def _do_look(self, args):
         print("LOOK")
