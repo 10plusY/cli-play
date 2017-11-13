@@ -10,7 +10,7 @@ import argparse
 
 class Command(object):
     """ Command object """
-    def __init__(self, name, logging=False):
+    def __init__(self, name, logging):
         self.name = name
         self.logging = logging
 
@@ -30,9 +30,9 @@ class ListCommand(Command):
 
         return self._filelist
 
-    def call(self, args):
+    def list(self, audio=None):
         for f in self.filelist:
-            if not args.a:
+            if not audio:
                 print(f + '\n')
             else:
                 try:
@@ -41,23 +41,28 @@ class ListCommand(Command):
                 except:
                     pass
 
+    def call(self, args):
+        self.list(args.a)
+
 class LookCommand(Command):
     def __init__(self, name, logging):
         super('look', logging)
 
     @property
     def cached_tree(self):
+        """
+        Saves the tree audio files from each call.
+        Appends new levels at each call.
+        """
         return None
 
-    def call(self, args):
-        level = args.l
-
+    def look(self, level):
         if level > 0:
             walk_path = '.'
         elif level < 0:
             walk_path = '/'.join(['..'] * level)
         else:
-            print("Can't walk 0 levels")
+            return
 
         depth = os.path.abspath(walk_path).count(os.path.sep)
 
@@ -68,6 +73,9 @@ class LookCommand(Command):
 
             if depth + abs(level) <= depth_from_root:
                 del dirs[:]
+
+    def call(self, args):
+        self.look(args.l)
 
 class UpdateCommand(Command):
     def __init__(self, name, logging):
@@ -80,19 +88,22 @@ class UpdateCommand(Command):
 
         return self._playlists
 
-    def call(self, args):
-        playlist, track = args.p, args.t
-
+    def update(self, playlist, track, remove):
         if not track:
             self.playlists[playlist]
         else:
-            if args.a:
+            if not remove:
                 self.playlists[playlist].append(track)
             else:
                 try:
                     self.playlists[playlist].remove(track)
                 except ValueError:
                     pass
+
+    def call(self, args):
+        self.update(args.p, args.t, args.r)
+
+# COMMAND LIST
 
 class CommandList(object):
     """ Command list object """
@@ -127,8 +138,6 @@ class CliPlay(Cmd):
 
     def __init__(self, **kwargs):
         Cmd.__init__(self, **kwargs)
-
-        self.playlists = defaultdict(list)
 
         self.parser = argparse.ArgumentParser()
         subparsers = self.parser.add_subparsers()
@@ -166,22 +175,13 @@ class CliPlay(Cmd):
         self.prompt = '(Folder: {}): '.format(os.path.basename(os.getcwd()))
 
     def _do_list(self, args):
-        print('LIST')
-
-    def _do_update(self, args):
-        print('update')
+        print('***LIST***')
 
     def _do_look(self, args):
-        print("LOOK")
-        # if args.d and args.u:
-        #     print(*utils.enqueue_tree(args.d), sep='\n')
-        #     print(*utils.enqueue_tree(args.u, down=False), sep='\n')
-        # elif args.d:
-        #     print(*utils.enqueue_tree(args.d), sep='\n')
-        # elif args.u:
-        #     print(*utils.enqueue_tree(args.u, down=False), sep='\n')
-        # else:
-        #     print("No args given")
+        print('***LOOK***')
+
+    def _do_update(self, args):
+        print('***UPDATE***')
 
     def do_quit(self, args):
         print("Shutting down...")
