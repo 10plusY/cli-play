@@ -49,8 +49,37 @@ class LookCommand(Command):
     def __init__(self, name, logging):
         super('look', logging)
 
+    @property
+    def cached_tree(self):
+        return None
+
+    def walk_to_level(self, path, level):
+        a_path = os.path.abspath(path)
+
+        current_depth = a_path.count(os.path.sep)
+
+        for root, dirs, files in os.walk(path):
+            yield root, dirs, files
+
+            root_depth = root.count(os.path.sep)
+
+            if current_depth + level <= root_depth:
+                del dirs[:]
+
+    def walk_down(self, level):
+        self.walk_to_level('.', level)
+
+    def walk_up(self, level):
+        self.walk_to_level('/'.join(['..'] * level), level)
+
     def call(args):
-        pass
+        if args.d:
+            walk_down(args.d)
+
+        if args.u:
+            walk_up(args.u)
+
+
 
 class UpdateCommand(Command):
     def __init__(self, name, logging):
