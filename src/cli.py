@@ -8,8 +8,12 @@ import os
 import shlex
 import argparse
 
-class ArgDict(object):
+class ArgConfig(object):
     def __init__(self, args_ns, needed):
+        # What use is there for the NS? If you are using it
+        # to make a dict then why does it need to be a property?
+        #
+        # TODO: Explore using one more object for the config and the command
         self.args_ns = args_ns
         self.needed = needed
 
@@ -30,9 +34,10 @@ class ArgDict(object):
 
 class Command(object):
     """ Command object """
-    def __init__(self, name, logging):
+    def __init__(self, name, logging, ns, needed):
         self.name = name
         self.logging = logging
+        self.config = ArgConfig(ns, needed)
 
     def call(self, args):
         raise NotImplemented("Command call must be implemented.")
@@ -40,9 +45,6 @@ class Command(object):
 # Organize the commands based on the data structures they manipulate.
 
 class ListCommand(Command):
-    def __init__(self, name, logging):
-        super('list', logging)
-
     @property
     def filelist(self):
         if self._filelist is None:
@@ -65,9 +67,6 @@ class ListCommand(Command):
         self.list(args.a)
 
 class LookCommand(Command):
-    def __init__(self, name, logging):
-        super('look', logging)
-
     @property
     def cached_tree(self):
         """
@@ -98,9 +97,6 @@ class LookCommand(Command):
         self.look(args.l)
 
 class UpdateCommand(Command):
-    def __init__(self, name, logging):
-        super('update', logging)
-
     @property
     def playlists(self):
         if self._playlists is None:
