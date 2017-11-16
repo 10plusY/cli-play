@@ -8,6 +8,26 @@ import os
 import shlex
 import argparse
 
+class ArgDict(object):
+    def __init__(self, args_ns, needed):
+        self.args_ns = args_ns
+        self.needed = needed
+
+    def get_arg_dict(self, arg_ns, needed):
+        if not isinstance(arg_ns, argparse.Namespace):
+            raise Exception("Not an arg namespace.")
+        else:
+            config = {}
+            for arg in needed:
+                config[arg] = getattr(arg_ns, arg) or ''
+
+            return config
+
+    @property
+    def dict(self):
+        return self.get_arg_dict(self.arg_ns, self.needed)
+
+
 class Command(object):
     """ Command object """
     def __init__(self, name, logging):
